@@ -1,0 +1,73 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Upload File</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Upload Your File</h1>
+        <form id="uploadForm" action="{% url 'upload_file' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="upload-section">
+                <input type="file" id="file_input" name="file" accept="*/*" style="display: none;" onchange="updateFileName()">
+                <label for="file_input" class="file-label">
+                    <i class="fas fa-upload"></i> Select File
+                </label>
+                <input type="text" id="file_name" name="file_name" placeholder="Enter file name" class="file-name-input" required>
+                <div id="file-selected-message" style="margin-top: 10px; color: #4CAF50;">
+                    <span id="selected-file-name"></span> <!-- Display selected file name -->
+                    <button type="button" id="remove-file-btn" style="display: none; margin-left: 10px; background: none; border: none; cursor: pointer;" onclick="removeFile()">
+                        <i class="fas fa-trash-alt" style="color: #f44336;"></i>
+                    </button>
+                </div>
+                <button type="submit" class="btn">Upload</button>
+            </div>
+        </form>
+
+        <div id="progressContainer" style="display: none;">
+            <progress id="progressBar" value="0" max="100" style="width: 100%;"></progress>
+            <span id="progressPercentage">0%</span>
+        </div>
+
+        {% if messages %}
+        <div class="alert">
+            {% for message in messages %}
+            <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <h2>Uploaded Files</h2>
+        <div class="uploaded-files">  <!-- Changed class name for clarity -->
+            {% for uploaded_file in uploaded_files %}
+            <div class="file-item">  <!-- Changed class name for clarity -->
+                <p>{{ uploaded_file.file.name }}</p>
+                <div class="actions">
+                    <a href="{{ uploaded_file.file.url }}" class="btn open" target="_blank">Open</a>
+                    <form action="{% url 'delete_file' uploaded_file.id %}" method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn delete" title="Delete">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+            <p>No files uploaded yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script src="{% static 'js/script.js' %}"></script>  <!-- Link to your existing script file -->
+</body>
+
+</html>
+
